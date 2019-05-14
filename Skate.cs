@@ -74,11 +74,35 @@ namespace tonytext
             Console.WriteLine("");
         }
 
+        public void PrintArea()
+        {
+            if (height > 0)
+                Console.WriteLine("SKATER {0} is airborne!", name);
+
+            if (height > 1)
+                return;
+
+            if (height == 1)
+            {
+                Console.WriteLine(" * below is {0}", area.ahead);
+                return;
+            }
+
+            if (area.current != Surface.Land)
+                Console.WriteLine(" * current is {0}", area.current);
+            if (area.ahead != Surface.Land)
+                Console.WriteLine(" * ahead is {0}", area.ahead);
+            if (area.left != Surface.Land)
+                Console.WriteLine(" * left is {0}", area.left);
+            if (area.right != Surface.Land)
+                Console.WriteLine(" * right is {0}", area.right);
+        }
+
         public void Act(Action action)
         {
             if (bail)
             {
-                Console.WriteLine("SKATER {0} recover!", action);
+                Console.WriteLine("SKATER {0} recover!", name);
                 bail = false;
                 return;
             }
@@ -96,6 +120,10 @@ namespace tonytext
             switch (action)
             {
                 case Action.None:
+                    dir = 0;
+                    break;
+
+                case Action.Forward:
                     dir = 0;
                     break;
 
@@ -132,8 +160,6 @@ namespace tonytext
                     tryGrab = true;
                     break;
             }
-
-            area.Move(dir);
 
             if (height == 0 && tryJump)
             {
@@ -197,6 +223,11 @@ namespace tonytext
             if (grab && height > 0)
                 combo += 10;
 
+            if (manual && height <= 0 && area.current != Surface.Rail)
+                combo += 5;
+            if (grind && height <= 0 && area.current == Surface.Rail)
+                combo += 5;
+
             if (height <= 0 && tryGrab)
             {
                 Bail();
@@ -210,9 +241,18 @@ namespace tonytext
             }
 
             if (height <= 0 && (area.current == Surface.Land || area.current == Surface.Kicker || area.current == Surface.Ramp) && tryManual)
+            {
                 manual = true;
+                combo += 10;
+                multiplier += 1;
+            }
+
             if (height <= 0 && (area.current == Surface.Rail) && tryGrind)
+            {
                 grind = true;
+                combo += 10;
+                multiplier += 1;
+            }
 
             if (height > 0 && tryKickflip)
             {
@@ -228,8 +268,10 @@ namespace tonytext
                 multiplier += 1;
             }
 
-            if (landed)
+            if (landed && !manual)
                 Land();
+
+            area.Move(dir);
         }
 
         public void Land()
@@ -267,7 +309,6 @@ namespace tonytext
     public enum Surface
     {
         None,
-        Air,
         Land,
         Rail,
         Kicker,
@@ -277,6 +318,7 @@ namespace tonytext
     public enum Action
     {
         None,
+        Forward,
         Left,
         Right,
         Jump,
@@ -317,13 +359,12 @@ namespace tonytext
         {
             var choice = random.Next();
 
-            switch (choice % 5)
+            switch (choice % 4)
             {
-                case 0: return Surface.Air;
-                case 1: return Surface.Land;
-                case 2: return Surface.Rail;
-                case 3: return Surface.Kicker;
-                case 4: return Surface.Ramp;
+                case 0: return Surface.Land;
+                case 1: return Surface.Rail;
+                case 2: return Surface.Kicker;
+                case 3: return Surface.Ramp;
             }
 
             return Surface.None;
@@ -364,12 +405,6 @@ namespace tonytext
 
     class ProgramWrapper
     {
-        // you are on a grind rail
-        // you are x above ground
-        // choose action
-        // to your left you see a grind rail
-        // ahead is a halfpipe
-
         public static void MainWrapper(string[] args)
         {
             Console.WriteLine("SKATE TIME");
@@ -387,9 +422,10 @@ namespace tonytext
             while (true)
             {
                 Console.WriteLine("");
+                Console.WriteLine("");
 
                 skater.Print();
-                skater.area.Print();
+                skater.PrintArea();
 
                 Console.WriteLine("Choose: [W] forward, [A] left, [D] right, [J] jump, [R] grind, [M] manual [G] grab [K] kickflip [ESC] quit");
 
@@ -400,7 +436,8 @@ namespace tonytext
                 switch (key.Key)
                 {
                     case ConsoleKey.Escape: exit = true; break;
-                    case ConsoleKey.W: action = Action.None; break;
+                    case ConsoleKey.Enter: action = Action.None; break;
+                    case ConsoleKey.W: action = Action.Forward; break;
                     case ConsoleKey.A: action = Action.Left; break;
                     case ConsoleKey.D: action = Action.Right; break;
                     case ConsoleKey.J: action = Action.Jump; break;
