@@ -429,6 +429,11 @@ namespace tonytext
                     case Action.None:
                         if (area.current == Surface.Rail)
                             bail = true;
+                        if (height > 0)
+                        {
+                            state = State.Skating;
+                            break;
+                        }
                         combo += ManualContinue;
                         break;
 
@@ -436,6 +441,11 @@ namespace tonytext
                         balance += 1;
                         if (area.current == Surface.Rail)
                             bail = true;
+                        if (height > 0)
+                        {
+                            state = State.Skating;
+                            break;
+                        }
                         combo += ManualContinue;
                         break;
 
@@ -443,18 +453,33 @@ namespace tonytext
                         balance -= 1;
                         if (area.current == Surface.Rail)
                             bail = true;
+                        if (height > 0)
+                        {
+                            state = State.Skating;
+                            break;
+                        }
                         combo += ManualContinue;
                         break;
 
                     case Action.Left:
                         if (area.current == Surface.Rail)
                             bail = true;
+                        if (height > 0)
+                        {
+                            state = State.Skating;
+                            break;
+                        }
                         combo += ManualContinue;
                         break;
 
                     case Action.Right:
                         if (area.current == Surface.Rail)
                             bail = true;
+                        if (height > 0)
+                        {
+                            state = State.Skating;
+                            break;
+                        }
                         combo += ManualContinue;
                         break;
 
