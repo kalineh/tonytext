@@ -42,6 +42,8 @@ namespace tonytext
         private static int RideKicker = 1;
         private static int RideRamp = 2;
 
+        private static int TiltChance = 20;
+
         private Random random;
 
         public string name;
@@ -115,7 +117,7 @@ namespace tonytext
                 return;
             }
 
-            if (area.ahead != Surface.Land)
+            if (area.current != Surface.Kicker && area.current != Surface.Ramp && area.ahead != Surface.Land)
                 Console.WriteLine(" * ahead is {0}", area.ahead);
             if (area.left != Surface.Land)
                 Console.WriteLine(" * left is {0}", area.left);
@@ -273,6 +275,14 @@ namespace tonytext
             {
                 var landed = (prevHeight == 1) && (currHeight == 0);
 
+                var tilt = 0;
+                var roll = random.Next() % 100;
+
+                if (roll < Skater.TiltChance)
+                    tilt = -1;
+                if (roll > (100 - Skater.TiltChance))
+                    tilt = +1;
+
                 var bail = false;
 
                 area.Move(0);
@@ -285,6 +295,7 @@ namespace tonytext
                             state = State.Skating;
                             landed = true;
                         }
+                        balance += tilt;
                         break;
 
                     case Action.Forward:
@@ -292,7 +303,9 @@ namespace tonytext
                         {
                             state = State.Skating;
                             landed = true;
+                            break;
                         }
+                        balance += tilt;
                         break;
 
                     case Action.Backward:
@@ -300,27 +313,29 @@ namespace tonytext
                         {
                             state = State.Skating;
                             landed = true;
+                            break;
                         }
+                        balance += tilt;
                         break;
 
                     case Action.Left:
-                        balance -= 1;
-
                         if (area.current != Surface.Rail)
                         {
                             state = State.Skating;
                             landed = true;
+                            break;
                         }
+                        balance -= 1;
                         break;
 
                     case Action.Right:
-                        balance += 1;
-
                         if (area.current != Surface.Rail)
                         {
                             state = State.Skating;
                             landed = true;
+                            break;
                         }
+                        balance += 1;
                         break;
 
                     case Action.Jump:
@@ -329,7 +344,14 @@ namespace tonytext
                         break;
 
                     case Action.Grind:
+                        if (height == 0 && area.current != Surface.Rail)
+                        {
+                            state = State.Skating;
+                            landed = true;
+                            break;
+                        }
                         combo += GrindContinue;
+                        balance += tilt;
                         break;
 
                     case Action.Manual:
@@ -392,6 +414,14 @@ namespace tonytext
 
             if (state == State.Manualing)
             {
+                var tilt = 0;
+                var roll = random.Next() % 100;
+
+                if (roll < Skater.TiltChance)
+                    tilt = -1;
+                if (roll > (100 - Skater.TiltChance))
+                    tilt = +1;
+
                 var bail = false;
                 var dir = 0;
 
@@ -428,59 +458,77 @@ namespace tonytext
                 {
                     case Action.None:
                         if (area.current == Surface.Rail)
+                        {
                             bail = true;
+                            break;
+                        }
                         if (height > 0)
                         {
                             state = State.Skating;
                             break;
                         }
                         combo += ManualContinue;
+                        balance += tilt;
                         break;
 
                     case Action.Forward:
-                        balance += 1;
                         if (area.current == Surface.Rail)
+                        {
                             bail = true;
+                            break;
+                        }
                         if (height > 0)
                         {
                             state = State.Skating;
                             break;
                         }
                         combo += ManualContinue;
+                        balance += 1;
                         break;
 
                     case Action.Backward:
-                        balance -= 1;
                         if (area.current == Surface.Rail)
+                        {
                             bail = true;
+                            break;
+                        }
                         if (height > 0)
                         {
                             state = State.Skating;
                             break;
                         }
                         combo += ManualContinue;
+                        balance -= 1;
                         break;
 
                     case Action.Left:
                         if (area.current == Surface.Rail)
+                        {
                             bail = true;
+                            break;
+                        }
                         if (height > 0)
                         {
                             state = State.Skating;
                             break;
                         }
                         combo += ManualContinue;
+                        balance += tilt;
                         break;
 
                     case Action.Right:
                         if (area.current == Surface.Rail)
+                        {
                             bail = true;
+                            break;
+                        }
                         if (height > 0)
                         {
                             state = State.Skating;
                             break;
                         }
                         combo += ManualContinue;
+                        balance += tilt;
                         break;
 
                     case Action.Jump:
@@ -508,7 +556,11 @@ namespace tonytext
 
                     case Action.Manual:
                         if (area.current == Surface.Rail)
+                        {
                             bail = true;
+                            break;
+                        }
+                        balance += tilt;
                         break;
 
                     case Action.Kickflip:
