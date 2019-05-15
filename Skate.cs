@@ -125,6 +125,60 @@ namespace tonytext
                 Console.WriteLine(" * right is {0}", area.right);
         }
 
+        public string DiscordStatus()
+        {
+            var status = string.Format("{0} - {1} points", name, score);
+
+            // skater
+
+            if (combo > 0)
+                status += string.Format(" - combo ({0} x{1})", combo, multiplier);
+
+            if (height == 0)
+                status += string.Format(" [{0} on {1}]", state, area.current);
+            if (height > 0)
+                status += string.Format(" [airborne {0}m]", height);
+
+            if (state == State.Grinding && balance < 0)
+                status += string.Format(" - tilting left");
+            if (state == State.Grinding && balance > 0)
+                status += string.Format(" - tilting right");
+
+            if (state == State.Manualing && balance < 0)
+                status += string.Format(" - tilting back");
+            if (state == State.Manualing && balance > 0)
+                status += string.Format(" - tilting forward");
+
+            // area
+
+            if (height > 1)
+            {
+                status += string.Format("\n* airborne");
+                return status;
+            }
+
+            if (height == 1)
+            {
+                status += string.Format("\n* below is {0}", area.ahead);
+                return status;
+            }
+
+            if (state == State.Grinding)
+            {
+                status += string.Format("\n* ahead is {0}", area.ahead);
+                return status;
+            }
+
+            if (area.current != Surface.Kicker && area.current != Surface.Ramp && area.ahead != Surface.Land)
+                status += string.Format("\n* ahead is {0}", area.ahead);
+            if (area.left != Surface.Land)
+                status += string.Format("\n* left is {0}", area.left);
+            if (area.right != Surface.Land)
+                status += string.Format("\n* right is {0}", area.right);
+
+            return status;
+        }
+
         public void Act(Action action)
         {
             if (state == State.Bailing)
@@ -885,6 +939,81 @@ namespace tonytext
             }
 
             Console.WriteLine("FINISH");
+        }
+
+        public static Action DiscordGetVote()
+        {
+            Console.WriteLine("Vote: [WASD] move, [Space] jump");
+            Console.WriteLine("Vote: [R] grind, [M] manual [G] grab [K] kickflip");
+
+            var key = Console.ReadKey(true);
+            var action = Action.None;
+            var exit = false;
+
+            switch (key.Key)
+            {
+                case ConsoleKey.Escape: exit = true; break;
+                case ConsoleKey.W: action = Action.Forward; break;
+                case ConsoleKey.S: action = Action.Backward; break;
+                case ConsoleKey.A: action = Action.Left; break;
+                case ConsoleKey.D: action = Action.Right; break;
+                case ConsoleKey.J: action = Action.Jump; break;
+                case ConsoleKey.R: action = Action.Grind; break;
+                case ConsoleKey.M: action = Action.Manual; break;
+                case ConsoleKey.K: action = Action.Kickflip; break;
+                case ConsoleKey.G: action = Action.Grab; break;
+            }
+
+            Console.WriteLine(" * Winning Vote: {0}", action);
+
+            return action;
+        }
+
+        public static void DiscordWrapper(string[] args)
+        {
+            var name = "Ascii Hawk";
+
+            if (args.Length > 0)
+                name = args[0];
+
+            var message = "";
+
+            message += String.Format("```");
+            message += String.Format(" SKATE TIME ");
+            message += String.Format("");
+            message += String.Format("   _0_    ");
+            message += String.Format("    |     ");
+            message += String.Format("   / 7    ");
+            message += String.Format(" -------  ");
+            message += String.Format("  o   o   ");
+            message += String.Format("```");
+
+            Discord.DiscordSetMessage(message);
+            Discord.DiscordWaitCycle();
+
+            message = string.Format("Skater {0} kicks off!", name);
+
+            Discord.DiscordSetMessage(message);
+            Discord.DiscordWaitCycle();
+
+            var skater = new Skater();
+
+            skater.name = name;
+
+            while (true)
+            {
+                message = skater.DiscordStatus();
+
+                Discord.DiscordSetMessage(message);
+                Discord.DiscordSetReactions();
+                Discord.DiscordWaitCycle();
+
+                var action = Discord.DiscordGetVote();
+
+                skater.Act(action);
+            }
+
+            Discord.DiscordSetMessage("Finished!");
         }
     }
 }
