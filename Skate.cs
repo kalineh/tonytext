@@ -150,6 +150,8 @@ namespace tonytext
                 status += string.Format(" [tilting back]");
             if (state == State.Manualing && balance > 0)
                 status += string.Format(" [tilting forward]");
+            if (state == State.Grabbing)
+                status += string.Format(" [holding a grab]");
 
             // area
 
@@ -845,12 +847,12 @@ namespace tonytext
 
         public void Land()
         {
-            Console.WriteLine("SKATER {0} LANDED!", name);
-
             score += combo * multiplier;
 
             if (combo > 0)
-                Console.WriteLine("  *** {0} points ***", combo * multiplier);
+                report += string.Format("\n *** Landed for {0} points! ***\n", combo * multiplier);
+            else
+                report += string.Format("\nLanded on {0}.", area.current);
 
             combo = 0;
             multiplier = 0;
@@ -860,7 +862,7 @@ namespace tonytext
 
         public void Bail()
         {
-            Console.WriteLine("SKATER {0} BAILED!", name);
+            report += string.Format("\n*** {0} BAILED! ***", name);
 
             combo = 0;
             multiplier = 0;
@@ -1124,8 +1126,11 @@ namespace tonytext
 
                 skater.Act(action);
 
-                Discord.DiscordSetMessage(skater.report);
-                Discord.DiscordWaitCycle();
+                if (!String.IsNullOrWhiteSpace(skater.report))
+                {
+                    Discord.DiscordSetMessage(skater.report);
+                    Discord.DiscordWaitCycle();
+                }
             }
 
             Discord.DiscordSetMessage("Finished!");
