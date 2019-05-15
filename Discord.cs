@@ -8,7 +8,7 @@ namespace tonytext
 
         public static Action DiscordGetVote()
         {
-            Console.WriteLine("Vote: [WASD] move, [Space] jump");
+            Console.WriteLine("Vote: [WASD] move, [J] jump");
             Console.WriteLine("Vote: [R] grind, [M] manual [G] grab [K] kickflip");
 
             var key = Console.ReadKey(true);
