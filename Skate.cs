@@ -147,9 +147,9 @@ namespace tonytext
                 var dir = 0;
                 var landed = (prevHeight == 1) && (currHeight == 0);
 
-                if (state == State.Skating && action == Action.Left)
+                if (action == Action.Left)
                     dir = -1;
-                if (state == State.Skating && action == Action.Right)
+                if (action == Action.Right)
                     dir = +1;
 
                 area.Move(dir);
@@ -189,6 +189,7 @@ namespace tonytext
                         if (area.current == Surface.Rail)
                         {
                             state = State.Grinding;
+                            balance = 0;
                             combo += GrindCombo;
                             multiplier += GrindMultiplier;
                         }
@@ -198,6 +199,7 @@ namespace tonytext
                         if (area.current != Surface.Rail)
                         {
                             state = State.Manualing;
+                            balance = 0;
                             combo += ManualCombo;
                             multiplier += ManualMultiplier;
                         }
@@ -296,6 +298,7 @@ namespace tonytext
                         if (height == 0 && area.current != Surface.Rail)
                         {
                             state = State.Manualing;
+                            balance = 0;
                             combo += ManualCombo;
                             multiplier += ManualMultiplier;
                         }
@@ -352,38 +355,47 @@ namespace tonytext
             if (state == State.Manualing)
             {
                 var bail = false;
+                var dir = 0;
 
-                area.Move(0);
+                if (action == Action.Left)
+                    dir = -1;
+                if (action == Action.Right)
+                    dir = +1;
+
+                area.Move(dir);
 
                 switch (action)
                 {
                     case Action.None:
                         if (area.current == Surface.Rail)
                             bail = true;
+                        combo += ManualContinue;
                         break;
 
                     case Action.Forward:
                         balance += 1;
                         if (area.current == Surface.Rail)
                             bail = true;
+                        combo += ManualContinue;
                         break;
 
                     case Action.Backward:
                         balance -= 1;
                         if (area.current == Surface.Rail)
                             bail = true;
+                        combo += ManualContinue;
                         break;
 
                     case Action.Left:
                         if (area.current == Surface.Rail)
                             bail = true;
+                        combo += ManualContinue;
                         break;
 
                     case Action.Right:
-                        balance += 1;
-
                         if (area.current == Surface.Rail)
                             bail = true;
+                        combo += ManualContinue;
                         break;
 
                     case Action.Jump:
@@ -400,7 +412,10 @@ namespace tonytext
 
                     case Action.Grind:
                         if (area.current == Surface.Rail)
+                        {
                             state = State.Grinding;
+                            balance = 0;
+                        }
                         break;
 
                     case Action.Manual:
@@ -475,7 +490,10 @@ namespace tonytext
 
                     case Action.Grind:
                         if (area.current == Surface.Rail)
+                        {
                             state = State.Grinding;
+                            balance = 0;
+                        }
                         break;
 
                     case Action.Manual:
