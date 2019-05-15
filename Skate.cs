@@ -562,13 +562,13 @@ namespace tonytext
                         break;
                 }
 
-                if (balance < -1)
+                if (balance < -1 && state == State.Grinding)
                 {
                     bail = true;
                     report += string.Format(" {0} loses balance and bails!", name);
                 }
 
-                if (balance > +1)
+                if (balance > +1 && state == State.Grinding)
                 {
                     bail = true;
                     report += string.Format(" {0} loses balance and bails!", name);
@@ -726,7 +726,7 @@ namespace tonytext
                         break;
 
                     case Action.Right:
-                        if (area.current == Surface.Rail)
+                        if (height == 0 && area.current == Surface.Rail)
                         {
                             bail = true;
                             report += string.Format("{0} manuals into a rail and bails!", name);
@@ -770,7 +770,7 @@ namespace tonytext
                         break;
 
                     case Action.Grind:
-                        if (area.current == Surface.Rail)
+                        if (height == 0 && area.current == Surface.Rail)
                         {
                             state = State.Grinding;
                             balance = 0;
@@ -782,7 +782,7 @@ namespace tonytext
                         break;
 
                     case Action.Manual:
-                        if (area.current == Surface.Rail)
+                        if (height == 0 && area.current == Surface.Rail)
                         {
                             bail = true;
                             report += string.Format("{0} manuals into a rail and bails!", name);
@@ -820,9 +820,9 @@ namespace tonytext
                         break;
                 }
 
-                if (balance < -1)
+                if (balance < -1 && state == State.Manualing)
                     bail = true;
-                if (balance > +1)
+                if (balance > +1 && state == State.Manualing)
                     bail = true;
 
                 if (bail)
@@ -970,7 +970,7 @@ namespace tonytext
             score += combo * multiplier;
 
             if (combo > 0)
-                report += string.Format("\n *** Landed for {0} points! ***\n", combo * multiplier);
+                report += string.Format("\n\n *** Landed for {0} points! ***\n", combo * multiplier);
             else
                 report += string.Format("\nLanded on {0}.", area.current);
 
@@ -982,7 +982,7 @@ namespace tonytext
 
         public void Bail()
         {
-            report += string.Format("\n*** {0} BAILED! ***", name);
+            report += string.Format("\n\n*** {0} BAILED! ***\n", name);
 
             combo = 0;
             multiplier = 0;
