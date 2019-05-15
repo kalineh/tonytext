@@ -779,8 +779,8 @@ namespace tonytext
                 Console.WriteLine("");
                 Console.WriteLine("");
 
-                skater.Print();
-                skater.PrintArea();
+                skater.PrintSkaterConsole();
+                skater.PrintAreaConsole();
 
                 Console.WriteLine("Choose: [WASD] move, [J] jump, [R] grind, [M] manual [G] grab [K] kickflip [ESC] quit");
 
