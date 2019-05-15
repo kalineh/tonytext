@@ -652,7 +652,7 @@ namespace tonytext
                 switch (action)
                 {
                     case Action.None:
-                        if (area.current == Surface.Rail)
+                        if (height == 0 && area.current == Surface.Rail)
                         {
                             bail = true;
                             report += string.Format("{0} manuals into a rail and bails!", name);
@@ -669,9 +669,10 @@ namespace tonytext
                         break;
 
                     case Action.Forward:
-                        if (area.current == Surface.Rail)
+                        if (height == 0 && area.current == Surface.Rail)
                         {
                             bail = true;
+                            report += string.Format("{0} manuals into a rail and bails!", name);
                             break;
                         }
                         if (height > 0)
@@ -688,9 +689,10 @@ namespace tonytext
                         break;
 
                     case Action.Backward:
-                        if (area.current == Surface.Rail)
+                        if (height == 0 && area.current == Surface.Rail)
                         {
                             bail = true;
+                            report += string.Format("{0} manuals into a rail and bails!", name);
                             break;
                         }
                         if (height > 0)
@@ -707,9 +709,10 @@ namespace tonytext
                         break;
 
                     case Action.Left:
-                        if (area.current == Surface.Rail)
+                        if (height == 0 && area.current == Surface.Rail)
                         {
                             bail = true;
+                            report += string.Format("{0} manuals into a rail and bails!", name);
                             break;
                         }
                         if (height > 0)
@@ -726,6 +729,7 @@ namespace tonytext
                         if (area.current == Surface.Rail)
                         {
                             bail = true;
+                            report += string.Format("{0} manuals into a rail and bails!", name);
                             break;
                         }
                         if (height > 0)
