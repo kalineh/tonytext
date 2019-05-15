@@ -34,11 +34,13 @@ namespace tonytext
         private static int KickflipCombo = 20;
         private static int KickflipMultiplier = 2;
 
-
         private static int JumpLand = 2;
         private static int JumpGrind = 3;
         private static int JumpKicker = 4;
         private static int JumpRamp = 6;
+
+        private static int RideKicker = 1;
+        private static int RideRamp = 2;
 
         private Random random;
 
@@ -135,8 +137,7 @@ namespace tonytext
             var prevHeight = height;
             var currHeight = height;
 
-            if (state != State.Grinding)
-                currHeight = System.Math.Max(height - 1, 0);
+            currHeight = System.Math.Max(height - 1, 0);
 
             height = currHeight;
 
@@ -153,6 +154,28 @@ namespace tonytext
                     dir = +1;
 
                 area.Move(dir);
+
+                if (prevHeight == 0)
+                {
+                    if (action == Action.Jump)
+                    {
+                        if (area.previous == Surface.Land)
+                            height += JumpLand;
+                        if (area.previous == Surface.Rail)
+                            height += JumpLand;
+                        if (area.previous == Surface.Kicker)
+                            height += JumpKicker;
+                        if (area.previous == Surface.Ramp)
+                            height += JumpRamp;
+                    }
+                    else
+                    {
+                        if (action != Action.Left && action != Action.Right && area.previous == Surface.Kicker)
+                            height += RideKicker;
+                        if (action != Action.Left && action != Action.Right && area.previous == Surface.Ramp)
+                            height += RideRamp;
+                    }
+                }
 
                 switch (action)
                 {
@@ -186,7 +209,7 @@ namespace tonytext
                         break;
 
                     case Action.Grind:
-                        if (area.current == Surface.Rail)
+                        if (height == 0 && area.current == Surface.Rail)
                         {
                             state = State.Grinding;
                             balance = 0;
@@ -196,7 +219,7 @@ namespace tonytext
                         break;
 
                     case Action.Manual:
-                        if (area.current != Surface.Rail)
+                        if (height == 0 && area.current != Surface.Rail)
                         {
                             state = State.Manualing;
                             balance = 0;
@@ -258,31 +281,46 @@ namespace tonytext
                 {
                     case Action.None:
                         if (area.current != Surface.Rail)
+                        {
                             state = State.Skating;
+                            landed = true;
+                        }
                         break;
 
                     case Action.Forward:
                         if (area.current != Surface.Rail)
+                        {
                             state = State.Skating;
+                            landed = true;
+                        }
                         break;
 
                     case Action.Backward:
                         if (area.current != Surface.Rail)
+                        {
                             state = State.Skating;
+                            landed = true;
+                        }
                         break;
 
                     case Action.Left:
                         balance -= 1;
 
                         if (area.current != Surface.Rail)
+                        {
                             state = State.Skating;
+                            landed = true;
+                        }
                         break;
 
                     case Action.Right:
                         balance += 1;
 
                         if (area.current != Surface.Rail)
+                        {
                             state = State.Skating;
+                            landed = true;
+                        }
                         break;
 
                     case Action.Jump:
@@ -343,7 +381,7 @@ namespace tonytext
                     return;
                 }
 
-                if (landed)
+                if (landed && state == State.Skating)
                 {
                     Land();
                     return;
@@ -363,6 +401,28 @@ namespace tonytext
                     dir = +1;
 
                 area.Move(dir);
+
+                if (prevHeight == 0)
+                {
+                    if (action == Action.Jump)
+                    {
+                        if (area.previous == Surface.Land)
+                            height += JumpLand;
+                        if (area.previous == Surface.Rail)
+                            height += JumpLand;
+                        if (area.previous == Surface.Kicker)
+                            height += JumpKicker;
+                        if (area.previous == Surface.Ramp)
+                            height += JumpRamp;
+                    }
+                    else
+                    {
+                        if (action != Action.Left && action != Action.Right && area.previous == Surface.Kicker)
+                            height += RideKicker;
+                        if (action != Action.Left && action != Action.Right && area.previous == Surface.Ramp)
+                            height += RideRamp;
+                    }
+                }
 
                 switch (action)
                 {
@@ -399,14 +459,17 @@ namespace tonytext
                         break;
 
                     case Action.Jump:
-                        if (area.current == Surface.Land)
-                            height += JumpLand;
-                        if (area.current == Surface.Rail)
-                            height += JumpLand;
-                        if (area.current == Surface.Kicker)
-                            height += JumpKicker;
-                        if (area.current == Surface.Ramp)
-                            height += JumpRamp;
+                        if (height == 0)
+                        {
+                            if (area.current == Surface.Land)
+                                height += JumpLand;
+                            if (area.current == Surface.Rail)
+                                height += JumpLand;
+                            if (area.current == Surface.Kicker)
+                                height += JumpKicker;
+                            if (area.current == Surface.Ramp)
+                                height += JumpRamp;
+                        }
                         state = State.Skating;
                         break;
 
@@ -493,12 +556,19 @@ namespace tonytext
                         {
                             state = State.Grinding;
                             balance = 0;
+                            break;
                         }
+
+                        state = State.Skating;
                         break;
 
                     case Action.Manual:
                         if (area.current == Surface.Rail)
+                        {
                             bail = true;
+                            break;
+                        }
+
                         if (height == 0)
                         {
                             state = State.Manualing;
@@ -524,7 +594,7 @@ namespace tonytext
                     return;
                 }
 
-                if (landed)
+                if (landed && state == State.Skating)
                 {
                     Land();
                     return;
