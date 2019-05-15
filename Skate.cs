@@ -153,6 +153,9 @@ namespace tonytext
             if (state == State.Grabbing)
                 status += string.Format(" [holding a grab]");
 
+            if (state == State.Bailing)
+                return status;
+
             // area
 
             if (height > 1)
@@ -898,7 +901,7 @@ namespace tonytext
                         break;
 
                     case Action.Grind:
-                        if (area.current == Surface.Rail)
+                        if (height == 0 && area.current == Surface.Rail)
                         {
                             state = State.Grinding;
                             balance = 0;
@@ -913,7 +916,7 @@ namespace tonytext
                         break;
 
                     case Action.Manual:
-                        if (area.current == Surface.Rail)
+                        if (height == 0 && area.current == Surface.Rail)
                         {
                             bail = true;
                             report += string.Format("{0} ends grab trick and tries to manual into a rail and bails.", name);
@@ -933,8 +936,17 @@ namespace tonytext
                         break;
 
                     case Action.Kickflip:
-                        bail = true;
-                        report += string.Format("{0} ends grab trick tries to kickflip into the ground and bails!", name);
+                        if (height == 0)
+                        {
+                            bail = true;
+                            report += string.Format("{0} ends grab trick tries to kickflip into the ground and bails!", name);
+                            break;
+                        }
+
+                        state = State.Skating;
+                        combo += KickflipCombo;
+                        multiplier += KickflipCombo;
+                        report += string.Format("{0} ends grab trick and does a kickflip!", name);
                         break;
 
                     case Action.Grab:
