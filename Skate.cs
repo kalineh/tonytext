@@ -696,6 +696,11 @@ namespace tonytext
         public Surface left;
         public Surface right;
 
+        private static Surface[] NextLand = new Surface[] { Surface.Land, Surface.Land, Surface.Rail, Surface.Kicker, Surface.Ramp, };
+        private static Surface[] NextRail = new Surface[] { Surface.Land, Surface.Land, Surface.Rail, Surface.Rail, Surface.Kicker, Surface.Ramp, };
+        private static Surface[] NextKicker = new Surface[] { Surface.Land, };
+        private static Surface[] NextRamp = new Surface[] { Surface.Land, };
+
         public Area()
         {
             random = new Random();
@@ -705,6 +710,24 @@ namespace tonytext
             ahead = RandomSurface();
             left = RandomSurface();
             right = RandomSurface();
+        }
+
+        public Surface NextSurface(Surface surface)
+        {
+            var pool = NextLand;
+
+            switch (surface)
+            {
+                case Surface.Land: pool = NextLand; break;
+                case Surface.Rail: pool = NextRail; break;
+                case Surface.Kicker: pool = NextKicker; break;
+                case Surface.Ramp: pool = NextRail; break;
+            }
+
+            var index = random.Next() % pool.Length;
+            var result = pool[index];
+
+            return result;
         }
 
         public Surface RandomSurface()
@@ -729,25 +752,25 @@ namespace tonytext
                 case 0:
                     previous = current;
                     current = ahead;
-                    ahead = RandomSurface();
                     left = RandomSurface();
                     right = RandomSurface();
+                    ahead = NextSurface(current);
                     break;
 
                 case -1:
                     previous = current;
                     current = left;
-                    ahead = RandomSurface();
                     left = RandomSurface();
                     right = RandomSurface();
+                    ahead = NextSurface(left);
                     break;
 
                 case +1:
                     previous = current;
                     current = right;
-                    ahead = RandomSurface();
                     left = RandomSurface();
                     right = RandomSurface();
+                    ahead = NextSurface(right);
                     break;
             }
         }
