@@ -627,10 +627,6 @@ namespace tonytext
 
                 return;
             }
-
-            Console.WriteLine("SKATER {0} does {1}", name, action);
-
-            return;
         }
 
         public void Land()
