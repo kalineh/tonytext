@@ -34,6 +34,12 @@ namespace tonytext
         private static int KickflipCombo = 20;
         private static int KickflipMultiplier = 2;
 
+
+        private static int JumpLand = 2;
+        private static int JumpGrind = 3;
+        private static int JumpKicker = 4;
+        private static int JumpRamp = 6;
+
         private Random random;
 
         public string name;
@@ -69,13 +75,20 @@ namespace tonytext
             if (combo > 0)
                 comboText = string.Format(" ({0} x{1})", combo, multiplier);
 
-            Console.Write("SKATER {0} - {1} points{2} [{3} on {4}]", name, score, comboText, state, area.current);
+            Console.Write("SKATER {0} - {1} points{2}", name, score, comboText, state, area.current);
+
+            if (height == 0)
+                Console.Write(" [{0} on {1}]", state, area.current);
+            if (height > 0)
+                Console.Write(" [airborne {0}m]", height);
 
             if (score > 0)
                 Console.Write(" - ({0} x{1})", combo, multiplier);
 
-            if (height > 0)
-                Console.Write(" - airborne ({0}m)", height);
+            if (state == State.Grinding)
+                Console.Write(" - grind balance {0}", balance);
+            if (state == State.Manualing)
+                Console.Write(" - manual balance {0}", balance);
 
             Console.WriteLine("");
         }
@@ -162,13 +175,13 @@ namespace tonytext
                         if (height == 0)
                         {
                             if (area.current == Surface.Land)
-                                height += 2;
+                                height += JumpLand;
                             if (area.current == Surface.Rail)
-                                height += 2;
+                                height += JumpLand;
                             if (area.current == Surface.Kicker)
-                                height += 4;
+                                height += JumpKicker;
                             if (area.current == Surface.Ramp)
-                                height += 6;
+                                height += JumpRamp;
                         }
                         break;
 
@@ -271,7 +284,7 @@ namespace tonytext
                         break;
 
                     case Action.Jump:
-                        height += 4;
+                        height += JumpGrind;
                         state = State.Skating;
                         break;
 
@@ -375,11 +388,13 @@ namespace tonytext
 
                     case Action.Jump:
                         if (area.current == Surface.Land)
-                            height += 2;
+                            height += JumpLand;
+                        if (area.current == Surface.Rail)
+                            height += JumpLand;
                         if (area.current == Surface.Kicker)
-                            height += 4;
+                            height += JumpKicker;
                         if (area.current == Surface.Ramp)
-                            height += 6;
+                            height += JumpRamp;
                         state = State.Skating;
                         break;
 
@@ -448,6 +463,14 @@ namespace tonytext
 
                     case Action.Jump:
                         state = State.Skating;
+                        if (area.current == Surface.Land)
+                            height += JumpLand;
+                        if (area.current == Surface.Rail)
+                            height += JumpLand;
+                        if (area.current == Surface.Kicker)
+                            height += JumpKicker;
+                        if (area.current == Surface.Ramp)
+                            height += JumpRamp;
                         break;
 
                     case Action.Grind:
