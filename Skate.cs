@@ -71,7 +71,7 @@ namespace tonytext
             Console.WriteLine("> state: {0}", state);
         }
 
-        public void Print()
+        public void PrintSkaterConsole()
         {
             var comboText = "";
             if (combo > 0)
@@ -95,7 +95,7 @@ namespace tonytext
             Console.WriteLine("");
         }
 
-        public void PrintArea()
+        public void PrintAreaConsole()
         {
             if (height > 1)
             {
@@ -631,172 +631,6 @@ namespace tonytext
             Console.WriteLine("SKATER {0} does {1}", name, action);
 
             return;
-            /*
-
-            var dir = 0;
-            var landed = false;
-            var tryJump = false;
-            var tryManual = false;
-            var tryGrind = false;
-            var tryGrab = false;
-            var tryKickflip = false;
-
-            switch (action)
-            {
-                case Action.None:
-                    dir = 0;
-                    break;
-
-                case Action.Forward:
-                    dir = 0;
-                    break;
-
-                case Action.Left:
-                    dir = 1;
-                    break;
-
-                case Action.Right:
-                    dir = 2;
-                    break;
-
-                case Action.Jump:
-                    dir = 0;
-                    tryJump = true;
-                    break;
-
-                case Action.Grind:
-                    dir = 0;
-                    tryGrind = true;
-                    break;
-
-                case Action.Manual:
-                    dir = 0;
-                    tryManual = true;
-                    break;
-
-                case Action.Kickflip:
-                    dir = 0;
-                    tryKickflip = true;
-                    break;
-
-                case Action.Grab:
-                    dir = 0;
-                    tryGrab = true;
-                    break;
-            }
-
-            if (height == 0 && tryJump)
-            {
-                if (area.current == Surface.Land)
-                    height += 2;
-                if (area.current == Surface.Kicker)
-                    height += 4;
-                if (area.current == Surface.Ramp)
-                    height += 6;
-
-                manual = false;
-                grind = false;
-                balance = 0;
-            }
-
-            if (height > 0)
-            {
-                height -= 1;
-
-                if (height == 0)
-                    landed = true;
-            }
-
-            if (grab && !tryGrab)
-                grab = false;
-
-            if (grind && dir == 1)
-                balance -= 1;
-            if (grind && dir == 2)
-                balance += 1;
-
-            if (manual && dir == 1)
-                balance -= 1;
-            if (manual && dir == 2)
-                balance += 1;
-
-            if (grind)
-            {
-                var waver = random.Next() % 3;
-                if (waver == 1)
-                    balance -= 1;
-                if (waver == 2)
-                    balance += 1;
-            }
-
-            if (grind && balance < -1)
-            {
-                Bail();
-                return;
-            }
-
-            if (grind && balance > +1)
-            {
-                Bail();
-                return;
-            }
-
-            if (kickflip && height > 0)
-                kickflip = false;
-
-            if (grab && height > 0)
-                combo += 10;
-
-            if (manual && height <= 0 && area.current != Surface.Rail)
-                combo += 5;
-            if (grind && height <= 0 && area.current == Surface.Rail)
-                combo += 5;
-
-            if (height <= 0 && tryGrab)
-            {
-                Bail();
-                return;
-            }
-
-            if (height <= 0 && tryKickflip)
-            {
-                Bail();
-                return;
-            }
-
-            if (height <= 0 && (area.current == Surface.Land || area.current == Surface.Kicker || area.current == Surface.Ramp) && tryManual)
-            {
-                manual = true;
-                combo += 10;
-                multiplier += 1;
-            }
-
-            if (height <= 0 && (area.current == Surface.Rail) && tryGrind)
-            {
-                grind = true;
-                combo += 10;
-                multiplier += 1;
-            }
-
-            if (height > 0 && tryKickflip)
-            {
-                kickflip = true;
-                combo += 10;
-                multiplier += 2;
-            }
-
-            if (height > 0 && tryGrab)
-            {
-                grab = true;
-                combo += 10;
-                multiplier += 1;
-            }
-
-            if (landed && !manual && !grind)
-                Land();
-
-            area.Move(dir);
-            */
         }
 
         public void Land()
