@@ -842,34 +842,55 @@ namespace tonytext
                 {
                     case Action.None:
                         state = State.Skating;
+                        report += string.Format("{0} ends grab trick.", name);
                         break;
 
                     case Action.Forward:
                         state = State.Skating;
+                        report += string.Format("{0} ends grab trick.", name);
                         break;
 
                     case Action.Backward:
                         state = State.Skating;
+                        report += string.Format("{0} ends grab trick.", name);
                         break;
 
                     case Action.Left:
                         state = State.Skating;
+                        report += string.Format("{0} ends grab trick.", name);
                         break;
 
                     case Action.Right:
                         state = State.Skating;
+                        report += string.Format("{0} ends grab trick.", name);
                         break;
 
                     case Action.Jump:
                         state = State.Skating;
-                        if (area.current == Surface.Land)
-                            height += JumpLand;
-                        if (area.current == Surface.Rail)
-                            height += JumpLand;
-                        if (area.current == Surface.Kicker)
-                            height += JumpKicker;
-                        if (area.current == Surface.Ramp)
-                            height += JumpRamp;
+                        if (height == 0)
+                        {
+                            if (area.current == Surface.Land)
+                            {
+                                height += JumpLand;
+                                report += string.Format("{0} lands grab trick and does an ollie!", name);
+                            }
+                            if (area.current == Surface.Rail)
+                            {
+                                height += JumpLand;
+                                report += string.Format("{0} lands grab trick and does an ollie!", name);
+                            }
+                            if (area.current == Surface.Kicker)
+                            {
+                                height += JumpKicker;
+                                report += string.Format("{0} lands grab trick and jumps off a kicker!", name);
+                            }
+                            if (area.current == Surface.Ramp)
+                            {
+                                height += JumpRamp;
+                                report += string.Format("{0} lands grab trick and jumps off a ramp!", name);
+                            }
+                        }
+                        report += string.Format("{0} ends grab trick.", name);
                         break;
 
                     case Action.Grind:
@@ -877,16 +898,21 @@ namespace tonytext
                         {
                             state = State.Grinding;
                             balance = 0;
+                            combo += GrindCombo;
+                            multiplier += GrindMultiplier;
+                            report += string.Format("{0} ends grab trick into a rail grind!", name);
                             break;
                         }
 
                         state = State.Skating;
+                        report += string.Format("{0} ends grab trick.", name);
                         break;
 
                     case Action.Manual:
                         if (area.current == Surface.Rail)
                         {
                             bail = true;
+                            report += string.Format("{0} ends grab trick and tries to manual into a rail and bails.", name);
                             break;
                         }
 
@@ -895,17 +921,27 @@ namespace tonytext
                             state = State.Manualing;
                             combo += ManualCombo;
                             multiplier += ManualMultiplier;
+                            report += string.Format("{0} ends grab trick lands into a manual!", name);
+                            break;
                         }
+
+                        report += string.Format("{0} ends grab trick.", name);
                         break;
 
                     case Action.Kickflip:
                         bail = true;
+                        report += string.Format("{0} ends grab trick tries to kickflip into the ground and bails!", name);
                         break;
 
                     case Action.Grab:
                         if (height == 0)
+                        {
                             bail = true;
+                            report += string.Format("{0} tries to hold grab trick into the floor and bails!", name);
+                            break;
+                        }
                         combo += GrabContinue;
+                        report += string.Format("{0} keeps holding grab!", name);
                         break;
                 }
 
