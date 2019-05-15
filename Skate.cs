@@ -992,6 +992,8 @@ namespace tonytext
 
             var skater = new Skater();
 
+            skater.name = "Tony Text";
+
             while (true)
             {
                 Console.WriteLine("");
