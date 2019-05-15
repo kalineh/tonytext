@@ -142,41 +142,59 @@ namespace tonytext
                 status += string.Format(" [airborne {0}m]", height);
 
             if (state == State.Grinding && balance < 0)
-                status += string.Format(" - tilting left");
+                status += string.Format(" [tilting left]");
             if (state == State.Grinding && balance > 0)
-                status += string.Format(" - tilting right");
+                status += string.Format(" [tilting right]");
 
             if (state == State.Manualing && balance < 0)
-                status += string.Format(" - tilting back");
+                status += string.Format(" [tilting back]");
             if (state == State.Manualing && balance > 0)
-                status += string.Format(" - tilting forward");
+                status += string.Format(" [tilting forward]");
 
             // area
 
             if (height > 1)
-            {
-                status += string.Format("\n* airborne");
                 return status;
-            }
 
             if (height == 1)
             {
-                status += string.Format("\n* below is {0}", area.ahead);
+                if (area.ahead == Surface.Land) status += string.Format("\nAbout to land.");
+                if (area.ahead == Surface.Rail) status += string.Format("\nAbout to land on a rail.");
+                if (area.ahead == Surface.Kicker) status += string.Format("\nAbout to land on a kicker.");
+                if (area.ahead == Surface.Ramp) status += string.Format("\nAbout to land on a ramp.");
+
                 return status;
             }
 
             if (state == State.Grinding)
             {
-                status += string.Format("\n* ahead is {0}", area.ahead);
+                if (area.ahead == Surface.Land) status += string.Format("\nGrind rail ends ahead.");
+                if (area.ahead == Surface.Rail) status += string.Format("\nGrind rail continues ahead.");
+                if (area.ahead == Surface.Kicker) status += string.Format("\nGrind rail ends at a kicker ahead.");
+                if (area.ahead == Surface.Ramp) status += string.Format("\nGrind rail ends at a ramp ahead.");
                 return status;
             }
 
             if (area.current != Surface.Kicker && area.current != Surface.Ramp && area.ahead != Surface.Land)
-                status += string.Format("\n* ahead is {0}", area.ahead);
+            {
+                if (area.ahead == Surface.Rail) status += string.Format("\nAhead is a grind rail.");
+                if (area.ahead == Surface.Kicker) status += string.Format("\nAhead is a kicker.");
+                if (area.ahead == Surface.Ramp) status += string.Format("\nAhead is a ramp.");
+            }
+
             if (area.left != Surface.Land)
-                status += string.Format("\n* left is {0}", area.left);
+            {
+                if (area.left == Surface.Rail) status += string.Format("\nThere is a grind rail to the left.");
+                if (area.left == Surface.Kicker) status += string.Format("\nThere is a kicker to the left.");
+                if (area.left == Surface.Ramp) status += string.Format("\nThere is a ramp to the left.");
+            }
+
             if (area.right != Surface.Land)
-                status += string.Format("\n* right is {0}", area.right);
+            {
+                if (area.right == Surface.Rail) status += string.Format("\nThere is a grind rail to the right.");
+                if (area.right == Surface.Kicker) status += string.Format("\nThere is a kicker to the right.");
+                if (area.right == Surface.Ramp) status += string.Format("\nThere is a ramp to the right.");
+            }
 
             return status;
         }
@@ -212,10 +230,6 @@ namespace tonytext
                 if (action == Action.Right)
                     dir = +1;
 
-                if (dir == 0) report += string.Format(" {0} skates forward.", name);
-                if (dir == -1) report += string.Format(" {0} skates to the left.", name);
-                if (dir == +1) report += string.Format(" {0} skates to the right.", name);
-
                 area.Move(dir);
 
                 if (prevHeight == 0)
@@ -225,25 +239,25 @@ namespace tonytext
                         if (area.previous == Surface.Land)
                         {
                             height += JumpLand;
-                            report += string.Format(" {0} does an ollie!", name);
+                            report += string.Format("{0} does an ollie! ", name);
                         }
 
                         if (area.previous == Surface.Rail)
                         {
                             height += JumpLand;
-                            report += string.Format(" {0} does an ollie!", name);
+                            report += string.Format("{0} does an ollie! ", name);
                         }
 
                         if (area.previous == Surface.Kicker)
                         {
                             height += JumpKicker;
-                            report += string.Format(" {0} jumps off a kicker!", name);
+                            report += string.Format("{0} jumps off a kicker! ", name);
                         }
 
                         if (area.previous == Surface.Ramp)
                         {
                             height += JumpRamp;
-                            report += string.Format(" {0} jumps off a ramp!", name);
+                            report += string.Format("{0} jumps off a ramp! ", name);
                         }
                     }
                     else
@@ -251,13 +265,13 @@ namespace tonytext
                         if (action != Action.Left && action != Action.Right && area.previous == Surface.Kicker)
                         {
                             height += RideKicker;
-                            report += string.Format(" {0} rides off a kicker.", name);
+                            report += string.Format("{0} rides off a kicker. ", name);
                         }
 
                         if (action != Action.Left && action != Action.Right && area.previous == Surface.Ramp)
                         {
                             height += RideRamp;
-                            report += string.Format(" {0} rides off a ramp.", name);
+                            report += string.Format("{0} rides off a ramp. ", name);
                         }
                     }
                 }
@@ -265,18 +279,23 @@ namespace tonytext
                 switch (action)
                 {
                     case Action.None:
+                        if (height == 0) report += string.Format("{0} skates forward.", name);
                         break;
 
                     case Action.Forward:
+                        if (height == 0) report += string.Format("{0} skates forward.", name);
                         break;
 
                     case Action.Backward:
+                        if (height == 0) report += string.Format("{0} skates forward.", name);
                         break;
 
                     case Action.Left:
+                        if (height == 0) report += string.Format("{0} skates to the left.", name);
                         break;
 
                     case Action.Right:
+                        if (height == 0) report += string.Format("{0} skates to the right.", name);
                         break;
 
                     case Action.Jump:
@@ -285,25 +304,25 @@ namespace tonytext
                             if (area.current == Surface.Land)
                             {
                                 height += JumpLand;
-                                report += string.Format(" {0} does an ollie!", name);
+                                report += string.Format("{0} does an ollie!", name);
                             }
 
                             if (area.current == Surface.Rail)
                             {
                                 height += JumpLand;
-                                report += string.Format(" {0} does an ollie!", name);
+                                report += string.Format("{0} does an ollie!", name);
                             }
 
                             if (area.current == Surface.Kicker)
                             {
                                 height += JumpKicker;
-                                report += string.Format(" {0} does an ollie!", name);
+                                report += string.Format("{0} does an ollie!", name);
                             }
 
                             if (area.current == Surface.Ramp)
                             {
                                 height += JumpRamp;
-                                report += string.Format(" {0} does an ollie!", name);
+                                report += string.Format("{0} does an ollie!", name);
                             }
                         }
                         break;
@@ -315,7 +334,7 @@ namespace tonytext
                             balance = 0;
                             combo += GrindCombo;
                             multiplier += GrindMultiplier;
-                            report += string.Format(" {0} starts grinding a rail!", name);
+                            report += string.Format("{0} starts grinding a rail!", name);
                         }
                         break;
 
@@ -326,13 +345,13 @@ namespace tonytext
                             balance = 0;
                             combo += ManualCombo;
                             multiplier += ManualMultiplier;
-                            report += string.Format(" {0} starts manualing!", name);
+                            report += string.Format("{0} starts manualing!", name);
                         }
 
                         if (area.current == Surface.Rail)
                         {
                             bail = true;
-                            report += string.Format(" {0} tries to manual into a grind rail and bails.", name);
+                            report += string.Format("{0} tries to manual into a grind rail and bails.", name);
                         }
 
                         break;
@@ -341,27 +360,27 @@ namespace tonytext
                         if (height == 0)
                         {
                             bail = true;
-                            report += string.Format(" {0} tries to kickflip into the floor and bails.", name);
+                            report += string.Format("{0} tries to kickflip into the floor and bails.", name);
                             break;
                         }
 
                         combo += KickflipCombo;
                         multiplier += KickflipMultiplier;
-                        report += string.Format(" {0} does a kickflip!", name);
+                        report += string.Format("{0} does a kickflip!", name);
                         break;
 
                     case Action.Grab:
                         if (height == 0)
                         {
                             bail = true;
-                            report += string.Format(" {0} tries to do a grab and bails.", name);
+                            report += string.Format("{0} tries to do a grab and bails.", name);
                             break;
                         }
 
                         combo += GrabCombo;
                         multiplier += GrabMultiplier;
                         state = State.Grabbing;
-                        report += string.Format(" {0} starts doing a grab!", name);
+                        report += string.Format("{0} starts doing a grab!", name);
                         break;
                 }
 
