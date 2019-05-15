@@ -30,6 +30,7 @@ namespace tonytext
             }
 
             Console.WriteLine(" * Winning Vote: {0}", action);
+            Console.WriteLine("");
 
             return action;
         }

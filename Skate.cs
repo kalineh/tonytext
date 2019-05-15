@@ -336,7 +336,10 @@ namespace tonytext
                             balance = 0;
                             combo += GrindCombo;
                             multiplier += GrindMultiplier;
-                            report += string.Format("{0} starts grinding a rail!", name);
+                            if (landed)
+                                report += string.Format("{0} lands into a rail grind!", name);
+                            else
+                                report += string.Format("{0} starts grinding a rail!", name);
                         }
                         break;
 
@@ -347,13 +350,17 @@ namespace tonytext
                             balance = 0;
                             combo += ManualCombo;
                             multiplier += ManualMultiplier;
-                            report += string.Format("{0} starts manualing!", name);
+                            if (landed)
+                                report += string.Format("{0} lands into a manual!", name);
+                            else
+                                report += string.Format("{0} starts a manual!", name);
                         }
 
-                        if (area.current == Surface.Rail)
+                        if (height == 0 && area.current == Surface.Rail)
                         {
                             bail = true;
                             report += string.Format("{0} tries to manual into a grind rail and bails.", name);
+                            break;
                         }
 
                         break;
@@ -427,7 +434,7 @@ namespace tonytext
                             break;
                         }
                         balance += tilt;
-                        report += string.Format(" {0} keeps grinding!", name);
+                        report += string.Format("{0} keeps grinding!", name);
                         break;
 
                     case Action.Forward:
@@ -438,7 +445,7 @@ namespace tonytext
                             break;
                         }
                         balance += tilt;
-                        report += string.Format(" {0} keeps grinding!", name);
+                        report += string.Format("{0} keeps grinding!", name);
                         break;
 
                     case Action.Backward:
@@ -449,7 +456,7 @@ namespace tonytext
                             break;
                         }
                         balance += tilt;
-                        report += string.Format(" {0} keeps grinding!", name);
+                        report += string.Format("{0} keeps grinding!", name);
                         break;
 
                     case Action.Left:
@@ -460,7 +467,10 @@ namespace tonytext
                             break;
                         }
                         balance -= 1;
-                        report += string.Format(" {0} keeps grinding!", name);
+                        if (balance == 0)
+                            report += string.Format("{0} keeps grinding and adjusts balance!", name);
+                        else
+                            report += string.Format("{0} keeps grinding!", name);
                         break;
 
                     case Action.Right:
@@ -471,13 +481,16 @@ namespace tonytext
                             break;
                         }
                         balance += 1;
-                        report += string.Format(" {0} keeps grinding!", name);
+                        if (balance == 0)
+                            report += string.Format("{0} keeps grinding and adjusts balance!", name);
+                        else
+                            report += string.Format("{0} keeps grinding!", name);
                         break;
 
                     case Action.Jump:
                         height += JumpGrind;
                         state = State.Skating;
-                        report += string.Format(" {0} jumps from the grind rail!", name);
+                        report += string.Format("{0} jumps from the grind rail!", name);
                         break;
 
                     case Action.Grind:
@@ -499,14 +512,14 @@ namespace tonytext
                             balance = 0;
                             combo += ManualCombo;
                             multiplier += ManualMultiplier;
-                            report += string.Format(" {0} lands into a manual!", name);
+                            report += string.Format(" {0} hops into a manual!", name);
                             break;
                         }
 
                         if (area.current == Surface.Rail)
                         {
                             bail = true;
-                            report += string.Format(" {0} tries to manual into a rail and bails.", name);
+                            report += string.Format(" {0} tries to manual on a rail and bails.", name);
                             break;
                         }
 
@@ -601,20 +614,38 @@ namespace tonytext
                     if (action == Action.Jump)
                     {
                         if (area.previous == Surface.Land)
+                        {
                             height += JumpLand;
+                            report += string.Format("{0} jumps from a manual! ", name);
+                        }
                         if (area.previous == Surface.Rail)
+                        {
                             height += JumpLand;
+                            report += string.Format("{0} jumps from a manual! ", name);
+                        }
                         if (area.previous == Surface.Kicker)
+                        {
                             height += JumpKicker;
+                            report += string.Format("{0} jumps off a kicker while manualing! ", name);
+                        }
                         if (area.previous == Surface.Ramp)
+                        {
                             height += JumpRamp;
+                            report += string.Format("{0} jumps off a ramp while manualing! ", name);
+                        }
                     }
                     else
                     {
                         if (action != Action.Left && action != Action.Right && area.previous == Surface.Kicker)
+                        {
                             height += RideKicker;
+                            report += string.Format("{0} rides off a kicker while manualing! ", name);
+                        }
                         if (action != Action.Left && action != Action.Right && area.previous == Surface.Ramp)
+                        {
                             height += RideRamp;
+                            report += string.Format("{0} rides off a kicker while manualing! ", name);
+                        }
                     }
                 }
 
@@ -624,6 +655,7 @@ namespace tonytext
                         if (area.current == Surface.Rail)
                         {
                             bail = true;
+                            report += string.Format("{0} manuals into a rail and bails!", name);
                             break;
                         }
                         if (height > 0)
@@ -633,6 +665,7 @@ namespace tonytext
                         }
                         combo += ManualContinue;
                         balance += tilt;
+                        report += string.Format("{0} keeps manualing!", name);
                         break;
 
                     case Action.Forward:
@@ -648,6 +681,10 @@ namespace tonytext
                         }
                         combo += ManualContinue;
                         balance += 1;
+                        if (balance == 0)
+                            report += string.Format("{0} keeps manualing and adjusts balance!", name);
+                        else
+                            report += string.Format("{0} keeps manualing!", name);
                         break;
 
                     case Action.Backward:
@@ -663,6 +700,10 @@ namespace tonytext
                         }
                         combo += ManualContinue;
                         balance -= 1;
+                        if (balance == 0)
+                            report += string.Format("{0} keeps manualing and adjusts balance!", name);
+                        else
+                            report += string.Format("{0} keeps manualing!", name);
                         break;
 
                     case Action.Left:
@@ -678,6 +719,7 @@ namespace tonytext
                         }
                         combo += ManualContinue;
                         balance += tilt;
+                        report += string.Format("{0} keeps manualing and turns left!", name);
                         break;
 
                     case Action.Right:
@@ -693,19 +735,32 @@ namespace tonytext
                         }
                         combo += ManualContinue;
                         balance += tilt;
+                        report += string.Format("{0} keeps manualing and turns right!", name);
                         break;
 
                     case Action.Jump:
                         if (height == 0)
                         {
                             if (area.current == Surface.Land)
+                            {
                                 height += JumpLand;
+                                report += string.Format("{0} manuals into an ollie!", name);
+                            }
                             if (area.current == Surface.Rail)
+                            {
                                 height += JumpLand;
+                                report += string.Format("{0} manuals into an ollie!", name);
+                            }
                             if (area.current == Surface.Kicker)
+                            {
                                 height += JumpKicker;
+                                report += string.Format("{0} manuals into a kicker jump!", name);
+                            }
                             if (area.current == Surface.Ramp)
+                            {
                                 height += JumpRamp;
+                                report += string.Format("{0} manuals into a ramp jump!", name);
+                            }
                         }
                         state = State.Skating;
                         break;
@@ -715,6 +770,10 @@ namespace tonytext
                         {
                             state = State.Grinding;
                             balance = 0;
+                            combo += GrindCombo;
+                            multiplier += GrindMultiplier;
+                            report += string.Format("{0} goes from manual into a grind!", name);
+                            break;
                         }
                         break;
 
@@ -722,17 +781,38 @@ namespace tonytext
                         if (area.current == Surface.Rail)
                         {
                             bail = true;
+                            report += string.Format("{0} manuals into a rail and bails!", name);
                             break;
                         }
                         balance += tilt;
+                        combo += ManualContinue;
+                        report += string.Format("{0} keeps manualing!", name);
                         break;
 
                     case Action.Kickflip:
-                        bail = true;
+                        if (height == 0)
+                        {
+                            bail = true;
+                            report += string.Format("{0} tries to kickflip into the floor and bails!", name);
+                            break;
+                        }
+                        combo += KickflipCombo;
+                        multiplier += KickflipMultiplier;
+                        state = State.Skating;
+                        report += string.Format("{0} does a kickflip from a manual!", name);
                         break;
 
                     case Action.Grab:
-                        bail = true;
+                        if (height == 0)
+                        {
+                            bail = true;
+                            report += string.Format("{0} tries to do a grab into the floor and bails!", name);
+                            break;
+                        }
+                        combo += GrabCombo;
+                        multiplier += GrabMultiplier;
+                        state = State.Grabbing;
+                        report += string.Format("{0} starts a grab from a manual!", name);
                         break;
                 }
 
@@ -1076,9 +1156,9 @@ namespace tonytext
                 case ConsoleKey.G: action = Action.Grab; break;
             }
 
-            Console.WriteLine("");
+            Console.WriteLine(" *");
             Console.WriteLine(" * Winning Vote: {0}", action);
-            Console.WriteLine("");
+            Console.WriteLine(" *");
 
             return action;
         }
