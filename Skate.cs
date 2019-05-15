@@ -10,16 +10,22 @@ namespace tonytext
 {
     class Skater
     {
+        public enum State
+        {
+            Skating,
+            Grinding,
+            Manualing,
+            Kickflipping,
+            Grabbing,
+            Bailing,
+        }
+
         private Random random;
 
         public string name;
         public int height;
         public int balance;
-        public bool bail;
-        public bool grind;
-        public bool manual;
-        public bool grab;
-        public bool kickflip;
+        public State state;
         public Area area;
         public int score;
         public int combo;
@@ -40,10 +46,7 @@ namespace tonytext
             Console.WriteLine("> score: {0}", score);
             Console.WriteLine("> height: {0}", height);
             Console.WriteLine("> balance: {0}", balance);
-            Console.WriteLine("> grind: {0}", grind);
-            Console.WriteLine("> manual: {0}", manual);
-            Console.WriteLine("> grab: {0}", grab);
-            Console.WriteLine("> kickflip: {0}", kickflip);
+            Console.WriteLine("> state: {0}", state);
         }
 
         public void Print()
@@ -52,7 +55,7 @@ namespace tonytext
             if (combo > 0)
                 comboText = string.Format(" ({0} x{1})", combo, multiplier);
 
-            Console.Write("SKATER {0} - {1} points{2}", name, score, comboText);
+            Console.Write("SKATER {0} - {1} points{2} [{3}]", name, score, comboText, state);
 
             if (score > 0)
                 Console.Write(" - ({0} x{1})", combo, multiplier);
@@ -60,31 +63,26 @@ namespace tonytext
             if (height > 0)
                 Console.Write(" - airborne ({0}m)", height);
 
-            if (bail)
-                Console.Write(" - bailed!");
-            if (grab)
-                Console.Write(" - grabbing!");
-            if (kickflip)
-                Console.Write(" - kickflipping!");
-            if (grind)
-                Console.Write(" - grinding ({0})!", balance);
-            if (manual)
-                Console.Write(" - manualling ({0})!", balance);
-
             Console.WriteLine("");
         }
 
         public void PrintArea()
         {
-            if (height > 0)
-                Console.WriteLine("SKATER {0} is airborne!", name);
-
             if (height > 1)
+            {
+                Console.WriteLine(" * big air");
                 return;
+            }
 
             if (height == 1)
             {
                 Console.WriteLine(" * below is {0}", area.ahead);
+                return;
+            }
+
+            if (state == State.Grinding)
+            {
+                Console.WriteLine(" * ahead is {0}", area.ahead);
                 return;
             }
 
@@ -100,14 +98,210 @@ namespace tonytext
 
         public void Act(Action action)
         {
-            if (bail)
+            if (state == State.Bailing)
             {
                 Console.WriteLine("SKATER {0} recover!", name);
-                bail = false;
+                state = State.Skating;
+                return;
+            }
+
+            Console.WriteLine("SKATER {0} does {1} (state: {2})", name, action, state);
+
+            var prevHeight = height;
+            var currHeight = height;
+
+            if (state != State.Grinding)
+                currHeight = System.Math.Max(height - 1, 0);
+
+            var landed = (prevHeight == 1) && (currHeight == 0);
+
+            height = currHeight;
+
+            var dir = 0;
+
+            if (state == State.Skating && action == Action.Left)
+                dir = -1;
+            if (state == State.Skating && action == Action.Right)
+                dir = +1;
+
+            var bail = false;
+
+            area.Move(dir);
+
+            if (state == State.Skating)
+            {
+                switch (action)
+                {
+                    case Action.None:
+                        break;
+
+                    case Action.Forward:
+                        break;
+
+                    case Action.Left:
+                        break;
+
+                    case Action.Right:
+                        break;
+
+                    case Action.Jump:
+                        if (height == 0)
+                        {
+                            if (area.current == Surface.Land)
+                                height += 2;
+                            if (area.current == Surface.Rail)
+                                height += 2;
+                            if (area.current == Surface.Kicker)
+                                height += 4;
+                            if (area.current == Surface.Ramp)
+                                height += 6;
+                        }
+                        break;
+
+                    case Action.Grind:
+                        if (area.current != Surface.Rail)
+                        {
+                            Bail();
+                            return;
+                        }
+
+                        state = State.Grinding;
+                        combo += 10;
+                        multiplier += 1;
+                        break;
+
+                    case Action.Manual:
+                        if (area.current == Surface.Rail)
+                        {
+                            Bail();
+                            return;
+                        }
+
+                        state = State.Manualing;
+                        combo += 10;
+                        multiplier += 1;
+                        break;
+
+                    case Action.Kickflip:
+                        if (height == 0)
+                            Bail();
+                        return;
+
+                    case Action.Grab:
+                        if (height == 0)
+                            Bail();
+                        return;
+                }
+
+                if (bail)
+                {
+                    Bail();
+                    return;
+                }
+
+                if (landed && state == State.Skating)
+                {
+                    Land();
+                    return;
+                }
+
+                return;
+            }
+
+            if (state == State.Grinding)
+            {
+                area.Move(0);
+
+                switch (action)
+                {
+                    case Action.None:
+                        if (area.current != Surface.Rail)
+                            state = State.Skating;
+                        break;
+
+                    case Action.Forward:
+                        if (area.current != Surface.Rail)
+                            state = State.Skating;
+                        break;
+
+                    case Action.Left:
+                        balance -= 1;
+
+                        if (area.current != Surface.Rail)
+                            state = State.Skating;
+                        break;
+
+                    case Action.Right:
+                        balance += 1;
+
+                        if (area.current != Surface.Rail)
+                            state = State.Skating;
+                        break;
+
+                    case Action.Jump:
+                        height += 4;
+                        state = State.Skating;
+                        break;
+
+                    case Action.Grind:
+                        combo += 10;
+                        break;
+
+                    case Action.Manual:
+                        if (area.current != Surface.Rail)
+                        {
+                            state = State.Manualing;
+                            combo += 10;
+                            multiplier += 1;
+                        }
+
+                        if (area.current == Surface.Rail)
+                            bail = true;
+
+                        break;
+
+                    case Action.Kickflip:
+                        if (height > 0)
+                        {
+                            state = State.Kickflipping;
+                            combo += 10;
+                            multiplier += 2;
+                        }
+                        if (height == 0)
+                            bail = true;
+                        break;
+
+                    case Action.Grab:
+                        if (height > 0)
+                        {
+                            state = State.Grabbing;
+                            combo += 10;
+                            multiplier += 1;
+                        }
+
+                        if (height == 0)
+                            bail = true;
+                        break;
+                }
+
+                if (state == State.Grinding && balance < -1)
+                    bail = true;
+                if (state == State.Grinding && balance > +1)
+                    bail = true;
+
+                if (bail)
+                {
+                    Bail();
+                    return;
+                }
+
                 return;
             }
 
             Console.WriteLine("SKATER {0} does {1}", name, action);
+
+            return;
+            /*
 
             var dir = 0;
             var landed = false;
@@ -268,10 +462,11 @@ namespace tonytext
                 multiplier += 1;
             }
 
-            if (landed && !manual)
+            if (landed && !manual && !grind)
                 Land();
 
             area.Move(dir);
+            */
         }
 
         public void Land()
@@ -285,24 +480,18 @@ namespace tonytext
 
             combo = 0;
             multiplier = 0;
-            bail = false;
-            grind = false;
-            manual = false;
-            grab = false;
-            kickflip = false;
+            state = State.Skating;
+            balance = 0;
         }
 
         public void Bail()
         {
             Console.WriteLine("SKATER {0} BAILED!");
 
-            bail = true;
             combo = 0;
             multiplier = 0;
-            grind = false;
-            manual = false;
-            grab = false;
-            kickflip = false;
+            state = State.Bailing;
+            balance = 0;
         }
     }
 
@@ -381,14 +570,14 @@ namespace tonytext
                     right = RandomSurface();
                     break;
 
-                case 1:
+                case -1:
                     current = left;
                     ahead = RandomSurface();
                     left = RandomSurface();
                     right = RandomSurface();
                     break;
 
-                case 2:
+                case +1:
                     current = right;
                     ahead = RandomSurface();
                     left = RandomSurface();
