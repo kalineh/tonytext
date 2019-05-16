@@ -8,6 +8,72 @@
 
 namespace tonytext
 {
+    class Discord
+    {
+        public static Action DiscordGetVote()
+        {
+            Console.WriteLine("Vote: [WASD] move, [J] jump");
+            Console.WriteLine("Vote: [R] grind, [M] manual [G] grab [K] kickflip");
+
+            var key = Console.ReadKey(true);
+            var action = Action.None;
+            var exit = false;
+
+            switch (key.Key)
+            {
+                case ConsoleKey.Escape: exit = true; break;
+                case ConsoleKey.W: action = Action.Forward; break;
+                case ConsoleKey.S: action = Action.Backward; break;
+                case ConsoleKey.A: action = Action.Left; break;
+                case ConsoleKey.D: action = Action.Right; break;
+                case ConsoleKey.J: action = Action.Jump; break;
+                case ConsoleKey.R: action = Action.Grind; break;
+                case ConsoleKey.M: action = Action.Manual; break;
+                case ConsoleKey.K: action = Action.Kickflip; break;
+                case ConsoleKey.G: action = Action.Grab; break;
+            }
+
+            Console.WriteLine(" * Winning Vote: {0}", action);
+            Console.WriteLine("");
+
+            return action;
+        }
+
+        public static void DiscordWaitCycle()
+        {
+            // while time < nextcycle; wait
+            return;
+        }
+
+        public static void DiscordSetMessage(string msg)
+        {
+            Console.WriteLine("[DISCORD]: {0}", msg);
+        }
+
+        public static void DiscordSetReactions()
+        {
+            Console.WriteLine("[REACTIONS]");
+        }
+
+        public static string DiscordActionReaction(Action action)
+        {
+            switch (action)
+            {
+                case Action.Forward: return "up_arrow"; break;
+                case Action.Backward: return "down_arrow"; break;
+                case Action.Left: return "left_arrow"; break;
+                case Action.Right: return "right_arrow"; break;
+                case Action.Jump: return "jump"; break;
+                case Action.Grind: return "grind"; break;
+                case Action.Manual: return "manual"; break;
+                case Action.Kickflip: return "kickflip"; break;
+                case Action.Grab: return "grab"; break;
+            }
+
+            return "none";
+        }
+    }
+
     class Skater
     {
         public enum State
@@ -77,54 +143,10 @@ namespace tonytext
 
         public void PrintSkaterConsole()
         {
-            var comboText = "";
-            if (combo > 0)
-                comboText = string.Format(" ({0} x{1})", combo, multiplier);
+            var status = DiscordStatus();
 
-            Console.Write("SKATER {0} - {1} points{2}", name, score, comboText, state, area.current);
-
-            if (height == 0)
-                Console.Write(" [{0} on {1}]", state, area.current);
-            if (height > 0)
-                Console.Write(" [airborne {0}m]", height);
-
-            if (score > 0)
-                Console.Write(" - ({0} x{1})", combo, multiplier);
-
-            if (state == State.Grinding)
-                Console.Write(" - grind balance {0}", balance);
-            if (state == State.Manualing)
-                Console.Write(" - manual balance {0}", balance);
-
+            Console.Write(status);
             Console.WriteLine("");
-        }
-
-        public void PrintAreaConsole()
-        {
-            if (height > 1)
-            {
-                Console.WriteLine(" * big air");
-                return;
-            }
-
-            if (height == 1)
-            {
-                Console.WriteLine(" * below is {0}", area.ahead);
-                return;
-            }
-
-            if (state == State.Grinding)
-            {
-                Console.WriteLine(" * ahead is {0}", area.ahead);
-                return;
-            }
-
-            if (area.current != Surface.Kicker && area.current != Surface.Ramp && area.ahead != Surface.Land)
-                Console.WriteLine(" * ahead is {0}", area.ahead);
-            if (area.left != Surface.Land)
-                Console.WriteLine(" * left is {0}", area.left);
-            if (area.right != Surface.Land)
-                Console.WriteLine(" * right is {0}", area.right);
         }
 
         public string DiscordStatus()
@@ -1153,7 +1175,6 @@ namespace tonytext
                 Console.WriteLine("");
 
                 skater.PrintSkaterConsole();
-                skater.PrintAreaConsole();
 
                 Console.WriteLine("Choose: [WASD] move, [J] jump, [R] grind, [M] manual [G] grab [K] kickflip [ESC] quit");
 
