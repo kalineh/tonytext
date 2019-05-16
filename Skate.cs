@@ -469,6 +469,7 @@ namespace tonytext
                         }
                         balance += tilt;
                         report += string.Format("{0} keeps grinding!", name);
+                        combo += GrindContinue;
                         break;
 
                     case Action.Forward:
@@ -480,6 +481,7 @@ namespace tonytext
                         }
                         balance += tilt;
                         report += string.Format("{0} keeps grinding!", name);
+                        combo += GrindContinue;
                         break;
 
                     case Action.Backward:
@@ -491,6 +493,7 @@ namespace tonytext
                         }
                         balance += tilt;
                         report += string.Format("{0} keeps grinding!", name);
+                        combo += GrindContinue;
                         break;
 
                     case Action.Left:
@@ -505,6 +508,7 @@ namespace tonytext
                             report += string.Format("{0} keeps grinding and adjusts balance!", name);
                         else
                             report += string.Format("{0} keeps grinding!", name);
+                        combo += GrindContinue;
                         break;
 
                     case Action.Right:
@@ -519,6 +523,7 @@ namespace tonytext
                             report += string.Format("{0} keeps grinding and adjusts balance!", name);
                         else
                             report += string.Format("{0} keeps grinding!", name);
+                        combo += GrindContinue;
                         break;
 
                     case Action.Jump:
