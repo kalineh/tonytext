@@ -14,7 +14,6 @@ namespace tonytext
         {
             var key = Console.ReadKey(true);
             var action = Action.None;
-            var exit = false;
 
             switch (key.Key)
             {
@@ -51,35 +50,6 @@ namespace tonytext
 
         public static void WaitVotes()
         {
-        }
-    }
-
-    public class DiscordIO
-    {
-        public static Action GetVotedAction()
-        {
-            return ConsoleIO.GetVotedAction();
-        }
-
-        public static void Print(string format, params string[] args)
-        {
-            ConsoleIO.Print(format, args);
-        }
-
-        public static void PrintInputPrompt()
-        {
-            ConsoleIO.Print("input | [WASD] move, [J] jump [R] grind, [M] manual [G] grab [K] kickflip");
-            ConsoleIO.Print("[X][W][A][S][D][J][G][M][K][G]");
-        }
-
-        public static bool IsReady()
-        {
-            return true;
-        }
-
-        public static void WaitVotes()
-        {
-            System.Threading.Thread.Sleep(1000);
         }
     }
 
@@ -1182,13 +1152,13 @@ namespace tonytext
             message += String.Format("\n  o   o   ");
             message += String.Format("\n```");
 
-            DiscordIO.Print(message);
-            DiscordIO.WaitVotes();
+            ConsoleIO.Print(message);
+            ConsoleIO.WaitVotes();
 
             message = string.Format("Skater {0} kicks off!", name);
 
-            DiscordIO.Print(message);
-            DiscordIO.WaitVotes();
+            ConsoleIO.Print(message);
+            ConsoleIO.WaitVotes();
 
             var skater = new Skater();
 
@@ -1196,15 +1166,17 @@ namespace tonytext
 
             while (true)
             {
+                ConsoleIO.Print("");
+
                 message = skater.DiscordStatus();
 
-                DiscordIO.Print(message);
-                DiscordIO.PrintInputPrompt();
-                DiscordIO.WaitVotes();
+                ConsoleIO.Print(message);
+                ConsoleIO.PrintInputPrompt();
+                ConsoleIO.WaitVotes();
 
-                var action = DiscordIO.GetVotedAction();
+                var action = ConsoleIO.GetVotedAction();
 
-                DiscordIO.Print("VOTE: {0}", action.ToString());
+                ConsoleIO.Print("VOTE: {0}", action.ToString());
 
                 if (action == Action.Exit)
                     break;
@@ -1213,12 +1185,12 @@ namespace tonytext
 
                 if (!String.IsNullOrWhiteSpace(skater.report))
                 {
-                    DiscordIO.Print(skater.report);
-                    DiscordIO.WaitVotes();
+                    ConsoleIO.Print(skater.report);
+                    ConsoleIO.WaitVotes();
                 }
             }
 
-            DiscordIO.Print("\nGame Over\n");
+            ConsoleIO.Print("\nGame Over\n");
         }
     }
 }
