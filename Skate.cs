@@ -1044,8 +1044,8 @@ namespace tonytext
         public Surface left;
         public Surface right;
 
-        private static Surface[] NextLand = new Surface[] { Surface.Land, Surface.Land, Surface.Rail, Surface.Kicker, Surface.Ramp, };
-        private static Surface[] NextRail = new Surface[] { Surface.Land, Surface.Land, Surface.Rail, Surface.Rail, Surface.Kicker, Surface.Ramp, };
+        private static Surface[] NextLand = new Surface[] { Surface.Land, Surface.Land, Surface.Land, Surface.Land, Surface.Rail, Surface.Rail, Surface.Kicker, Surface.Kicker, Surface.Ramp, };
+        private static Surface[] NextRail = new Surface[] { Surface.Land, Surface.Land, Surface.Rail, Surface.Rail, Surface.Rail, Surface.Rail, Surface.Kicker, Surface.Ramp, };
         private static Surface[] NextKicker = new Surface[] { Surface.Land, };
         private static Surface[] NextRamp = new Surface[] { Surface.Land, };
 
@@ -1110,7 +1110,7 @@ namespace tonytext
                     current = left;
                     left = RandomSurface();
                     right = RandomSurface();
-                    ahead = NextSurface(left);
+                    ahead = NextSurface(current);
                     break;
 
                 case +1:
@@ -1118,7 +1118,7 @@ namespace tonytext
                     current = right;
                     left = RandomSurface();
                     right = RandomSurface();
-                    ahead = NextSurface(right);
+                    ahead = NextSurface(current);
                     break;
             }
         }
