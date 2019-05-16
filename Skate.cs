@@ -8,20 +8,17 @@
 
 namespace tonytext
 {
-    class Discord
+    public class ConsoleIO
     {
-        public static Action DiscordGetVote()
+        public static Action GetVotedAction()
         {
-            Console.WriteLine("Vote: [WASD] move, [J] jump");
-            Console.WriteLine("Vote: [R] grind, [M] manual [G] grab [K] kickflip");
-
             var key = Console.ReadKey(true);
             var action = Action.None;
             var exit = false;
 
             switch (key.Key)
             {
-                case ConsoleKey.Escape: exit = true; break;
+                case ConsoleKey.Escape: action = Action.Exit; break;
                 case ConsoleKey.W: action = Action.Forward; break;
                 case ConsoleKey.S: action = Action.Backward; break;
                 case ConsoleKey.A: action = Action.Left; break;
@@ -33,44 +30,56 @@ namespace tonytext
                 case ConsoleKey.G: action = Action.Grab; break;
             }
 
-            Console.WriteLine(" * Winning Vote: {0}", action);
-            Console.WriteLine("");
-
             return action;
         }
 
-        public static void DiscordWaitCycle()
+        public static void Print(string format, params string[] args)
         {
-            // while time < nextcycle; wait
-            return;
+            Console.WriteLine(string.Format(format, args));
         }
 
-        public static void DiscordSetMessage(string msg)
+        public static void PrintInputPrompt()
         {
-            Console.WriteLine("[DISCORD]: {0}", msg);
+            Console.WriteLine("input | [WASD] move, [J] jump");
+            Console.WriteLine("input | [R] grind, [M] manual [G] grab [K] kickflip");
         }
 
-        public static void DiscordSetReactions()
+        public static bool IsReady()
         {
-            Console.WriteLine("[REACTIONS]");
+            return true;
         }
 
-        public static string DiscordActionReaction(Action action)
+        public static void WaitVotes()
         {
-            switch (action)
-            {
-                case Action.Forward: return "up_arrow"; break;
-                case Action.Backward: return "down_arrow"; break;
-                case Action.Left: return "left_arrow"; break;
-                case Action.Right: return "right_arrow"; break;
-                case Action.Jump: return "jump"; break;
-                case Action.Grind: return "grind"; break;
-                case Action.Manual: return "manual"; break;
-                case Action.Kickflip: return "kickflip"; break;
-                case Action.Grab: return "grab"; break;
-            }
+        }
+    }
 
-            return "none";
+    public class DiscordIO
+    {
+        public static Action GetVotedAction()
+        {
+            return ConsoleIO.GetVotedAction();
+        }
+
+        public static void Print(string format, params string[] args)
+        {
+            ConsoleIO.Print(format, args);
+        }
+
+        public static void PrintInputPrompt()
+        {
+            ConsoleIO.Print("input | [WASD] move, [J] jump [R] grind, [M] manual [G] grab [K] kickflip");
+            ConsoleIO.Print("[X][W][A][S][D][J][G][M][K][G]");
+        }
+
+        public static bool IsReady()
+        {
+            return true;
+        }
+
+        public static void WaitVotes()
+        {
+            System.Threading.Thread.Sleep(1000);
         }
     }
 
@@ -1046,6 +1055,7 @@ namespace tonytext
         Manual,
         Kickflip,
         Grab,
+        Exit,
 
         // 
         //   _0_
@@ -1144,99 +1154,11 @@ namespace tonytext
                     break;
             }
         }
-
-        public void Print()
-        {
-            Console.WriteLine("AREA: Previous: {0}, Current: {1}, Ahead: {2}, Left: {3}, Right: {4}", previous, current, ahead, left, right);
-        }
     }
 
     class ProgramWrapper
     {
         public static void MainWrapper(string[] args)
-        {
-            Console.WriteLine("SKATE TIME");
-
-            Console.WriteLine("");
-            Console.WriteLine("   _0_    ");
-            Console.WriteLine("    |     ");
-            Console.WriteLine("   / 7    ");
-            Console.WriteLine(" -------  ");
-            Console.WriteLine("  o   o   ");
-            Console.WriteLine("");
-
-            var skater = new Skater();
-
-            skater.name = "Tony Text";
-
-            while (true)
-            {
-                Console.WriteLine("");
-                Console.WriteLine("");
-
-                skater.PrintSkaterConsole();
-
-                Console.WriteLine("Choose: [WASD] move, [J] jump, [R] grind, [M] manual [G] grab [K] kickflip [ESC] quit");
-
-                var key = Console.ReadKey(true);
-                var action = Action.None;
-                var exit = false;
-
-                switch (key.Key)
-                {
-                    case ConsoleKey.Escape: exit = true; break;
-                    case ConsoleKey.Enter: action = Action.None; break;
-                    case ConsoleKey.W: action = Action.Forward; break;
-                    case ConsoleKey.S: action = Action.Backward; break;
-                    case ConsoleKey.A: action = Action.Left; break;
-                    case ConsoleKey.D: action = Action.Right; break;
-                    case ConsoleKey.J: action = Action.Jump; break;
-                    case ConsoleKey.R: action = Action.Grind; break;
-                    case ConsoleKey.M: action = Action.Manual; break;
-                    case ConsoleKey.K: action = Action.Kickflip; break;
-                    case ConsoleKey.G: action = Action.Grab; break;
-                }
-
-                if (exit)
-                    break;
-
-                skater.Act(action);
-            }
-
-            Console.WriteLine("FINISH");
-        }
-
-        public static Action DiscordGetVote()
-        {
-            Console.WriteLine("Vote: [WASD] move, [Space] jump");
-            Console.WriteLine("Vote: [R] grind, [M] manual [G] grab [K] kickflip");
-
-            var key = Console.ReadKey(true);
-            var action = Action.None;
-            var exit = false;
-
-            switch (key.Key)
-            {
-                case ConsoleKey.Escape: exit = true; break;
-                case ConsoleKey.W: action = Action.Forward; break;
-                case ConsoleKey.S: action = Action.Backward; break;
-                case ConsoleKey.A: action = Action.Left; break;
-                case ConsoleKey.D: action = Action.Right; break;
-                case ConsoleKey.J: action = Action.Jump; break;
-                case ConsoleKey.R: action = Action.Grind; break;
-                case ConsoleKey.M: action = Action.Manual; break;
-                case ConsoleKey.K: action = Action.Kickflip; break;
-                case ConsoleKey.G: action = Action.Grab; break;
-            }
-
-            Console.WriteLine(" *");
-            Console.WriteLine(" * Winning Vote: {0}", action);
-            Console.WriteLine(" *");
-
-            return action;
-        }
-
-        public static void DiscordWrapper(string[] args)
         {
             var name = "Tony Text";
 
@@ -1255,13 +1177,13 @@ namespace tonytext
             message += String.Format("\n  o   o   ");
             message += String.Format("\n```");
 
-            Discord.DiscordSetMessage(message);
-            Discord.DiscordWaitCycle();
+            DiscordIO.Print(message);
+            DiscordIO.WaitVotes();
 
             message = string.Format("Skater {0} kicks off!", name);
 
-            Discord.DiscordSetMessage(message);
-            Discord.DiscordWaitCycle();
+            DiscordIO.Print(message);
+            DiscordIO.WaitVotes();
 
             var skater = new Skater();
 
@@ -1271,22 +1193,27 @@ namespace tonytext
             {
                 message = skater.DiscordStatus();
 
-                Discord.DiscordSetMessage(message);
-                Discord.DiscordSetReactions();
-                Discord.DiscordWaitCycle();
+                DiscordIO.Print(message);
+                DiscordIO.PrintInputPrompt();
+                DiscordIO.WaitVotes();
 
-                var action = Discord.DiscordGetVote();
+                var action = DiscordIO.GetVotedAction();
+
+                DiscordIO.Print("VOTE: {0}", action.ToString());
+
+                if (action == Action.Exit)
+                    break;
 
                 skater.Act(action);
 
                 if (!String.IsNullOrWhiteSpace(skater.report))
                 {
-                    Discord.DiscordSetMessage(skater.report);
-                    Discord.DiscordWaitCycle();
+                    DiscordIO.Print(skater.report);
+                    DiscordIO.WaitVotes();
                 }
             }
 
-            Discord.DiscordSetMessage("Finished!");
+            DiscordIO.Print("\nGame Over\n");
         }
     }
 }

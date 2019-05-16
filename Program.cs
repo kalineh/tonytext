@@ -6,8 +6,7 @@ namespace tonytext
     {
         static void Main(string[] args)
         {
-            //ProgramWrapper.MainWrapper(args);
-            ProgramWrapper.DiscordWrapper(args);
+            ProgramWrapper.MainWrapper(args);
         }
     }
 }
